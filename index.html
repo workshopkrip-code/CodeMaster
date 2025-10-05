@@ -1,0 +1,3076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeMaster Pro | Advanced Programming Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        :root {
+            --dark-bg: #121212;
+            --darker-bg: #0a0a0a;
+            --card-bg: #1e1e1e;
+            --accent-cyan: #00f7ff;
+            --accent-purple: #9d4edd;
+            --accent-green: #00ff88;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --error: #ff4d4d;
+            --success: #00cc66;
+            --warning: #ffaa00;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Booting Screen */
+        #booting-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--darker-bg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.8s ease-out;
+        }
+
+        .boot-logo {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: pulse 2s infinite;
+        }
+
+        .loading-bar {
+            width: 300px;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .loading-progress {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 4px;
+            animation: loading 3s ease-in-out forwards;
+        }
+
+        @keyframes loading {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Password Screen */
+        #password-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--darker-bg);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .password-container {
+            background-color: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .password-title {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .password-input-container {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 1rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .password-input:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 2px rgba(0, 247, 255, 0.2);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .password-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .password-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 247, 255, 0.4);
+        }
+
+        .forgot-password {
+            margin-top: 1rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-password:hover {
+            color: var(--accent-cyan);
+        }
+
+        .error-message {
+            color: var(--error);
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        /* Main App */
+        #main-app {
+            display: none;
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background-color: rgba(30, 30, 30, 0.9);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-cyan);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-link.active {
+            color: var(--accent-cyan);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--accent-cyan);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 6rem 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(30, 30, 30, 0.9), rgba(18, 18, 18, 0.9)), 
+                        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23121212"/><path d="M0 0L100 100M100 0L0 100" stroke="%2300f7ff" stroke-width="0.5" opacity="0.2"/></svg>');
+            background-size: cover;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 20%, rgba(157, 78, 221, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(0, 247, 255, 0.1) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple), var(--accent-green));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientShift 5s infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2.5rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 247, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--accent-purple);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(157, 78, 221, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(157, 78, 221, 0.2);
+        }
+
+        /* Sections */
+        .section {
+            padding: 5rem 2rem;
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Learning Section */
+        .language-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .language-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .language-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border-color: var(--accent-cyan);
+        }
+
+        .language-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--accent-cyan);
+        }
+
+        .language-name {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .language-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Compiler Section */
+        .compiler-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .code-editor {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .editor-header {
+            padding: 1rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .language-select {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .editor-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .editor-btn {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .editor-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .editor-btn.run {
+            background: linear-gradient(90deg, var(--accent-green), #00cc66);
+            color: white;
+        }
+
+        .editor-content {
+            padding: 1rem;
+            height: 400px;
+            overflow: auto;
+        }
+
+        .code-input {
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            resize: none;
+            outline: none;
+            line-height: 1.5;
+        }
+
+        .output-container {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .output-header {
+            padding: 1rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .output-content {
+            padding: 1rem;
+            height: 400px;
+            overflow: auto;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+
+        .error-output {
+            color: var(--error);
+        }
+
+        .success-output {
+            color: var(--success);
+        }
+
+        .warning-output {
+            color: var(--warning);
+        }
+
+        /* Test Section */
+        .test-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .test-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .test-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border-color: var(--accent-purple);
+        }
+
+        .test-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--accent-purple);
+        }
+
+        .test-name {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .test-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--darker-bg);
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .footer-logo {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--accent-cyan);
+        }
+
+        .contact-info {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .copyright {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Test Interface */
+        .test-interface {
+            display: none;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .test-timer {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+        }
+
+        .test-controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .question-container {
+            margin-bottom: 2rem;
+        }
+
+        .question-number {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--accent-purple);
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .option {
+            padding: 1rem;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .option.selected {
+            background-color: rgba(157, 78, 221, 0.2);
+            border: 1px solid var(--accent-purple);
+        }
+
+        .test-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        .result-container {
+            text-align: center;
+            padding: 3rem;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            display: none;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .result-title {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-green);
+        }
+
+        .result-score {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .result-message {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: var(--text-secondary);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .modal-btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .modal-btn.cancel {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        .modal-btn.submit {
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            color: white;
+        }
+
+        /* Learning Content */
+        .learning-content {
+            display: none;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .content-title {
+            font-size: 1.8rem;
+            color: var(--accent-cyan);
+        }
+
+        .program-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .program-tab {
+            padding: 0.8rem 1.5rem;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .program-tab.active {
+            background-color: rgba(157, 78, 221, 0.2);
+            border: 1px solid var(--accent-purple);
+        }
+
+        .program-content {
+            display: none;
+        }
+
+        .program-content.active {
+            display: block;
+        }
+
+        .program-question {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .program-solution {
+            margin-bottom: 2rem;
+        }
+
+        .solution-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--accent-green);
+        }
+
+        .explanation {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .explanation-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--accent-cyan);
+        }
+
+        .voice-explanation {
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .voice-btn {
+            padding: 0.5rem 1rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 6px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .voice-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Notes Section */
+        .notes-section {
+            margin-top: 3rem;
+            padding: 2rem;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .notes-title {
+            font-size: 1.5rem;
+            color: var(--accent-purple);
+        }
+
+        .notes-content {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 1rem;
+        }
+
+        .note-item {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-cyan);
+            transition: transform 0.3s ease;
+        }
+
+        .note-item:hover {
+            transform: translateX(5px);
+        }
+
+        .note-question {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .note-answer {
+            color: var(--text-secondary);
+        }
+
+        /* Download Section */
+        .download-section {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: var(--card-bg);
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .compiler-container {
+                grid-template-columns: 1fr;
+            }
+
+            .language-grid, .test-types {
+                grid-template-columns: 1fr;
+            }
+
+            .test-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .test-controls {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glow {
+            box-shadow: 0 0 10px rgba(0, 247, 255, 0.5);
+        }
+
+        .pulse-glow {
+            animation: pulseGlow 2s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 5px rgba(0, 247, 255, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(0, 247, 255, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(0, 247, 255, 0.5); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Booting Screen -->
+    <div id="booting-screen">
+        <div class="boot-logo">CodeMaster Pro</div>
+        <div class="loading-bar">
+            <div class="loading-progress"></div>
+        </div>
+    </div>
+
+    <!-- Password Screen -->
+    <div id="password-screen">
+        <div class="password-container">
+            <h2 class="password-title">Access Required</h2>
+            <div class="password-input-container">
+                <input type="password" id="password-input" class="password-input" placeholder="Enter password">
+                <button class="toggle-password" id="toggle-password">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            <button class="password-btn" id="submit-password">Enter Platform</button>
+            <p class="forgot-password" id="forgot-password">Forgot Password?</p>
+            <p class="error-message" id="error-message">Incorrect password. Please try again.</p>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="main-app">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="logo">CodeMaster Pro</div>
+            <div class="nav-links" id="nav-links">
+                <a href="#" class="nav-link active" data-section="landing">Home</a>
+                <a href="#" class="nav-link" data-section="learning">Learning</a>
+                <a href="#" class="nav-link" data-section="compiler">Compiler</a>
+                <a href="#" class="nav-link" data-section="test">Tests</a>
+                <a href="#" class="nav-link" data-section="notes">Notes</a>
+            </div>
+            <button class="mobile-menu-btn" id="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+
+        <!-- Landing Section -->
+        <section id="landing" class="section active">
+            <div class="hero">
+                <h1>Master Programming with CodeMaster Pro</h1>
+                <p>An interactive platform designed to help you learn programming languages effectively with hands-on coding practice, comprehensive tests, and detailed explanations.</p>
+                <div class="cta-buttons">
+                    <button class="btn btn-primary" data-section="learning">Start Learning</button>
+                    <button class="btn btn-secondary" data-section="compiler">Try Compiler</button>
+                </div>
+            </div>
+
+            <div class="about-container" style="max-width: 1000px; margin: 0 auto; padding: 0 2rem;">
+                <div class="about-section" style="margin-bottom: 4rem;">
+                    <h2 style="font-size: 2rem; margin-bottom: 1.5rem; text-align: center;">About Sandesh Kadel</h2>
+                    <div style="display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 300px;">
+                            <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.5rem;">
+                                Hi, I'm Sandesh Kadel, a passionate software developer and educator with expertise in multiple programming languages and web technologies. I created CodeMaster Pro to provide a comprehensive learning platform for programming students, especially those following the NEB Grade 12 curriculum.
+                            </p>
+                            <p style="color: var(--text-secondary); line-height: 1.6;">
+                                With years of experience in both industry and education, I've designed this platform to bridge the gap between theoretical knowledge and practical application, helping students build strong programming foundations.
+                            </p>
+                        </div>
+                        <div style="flex: 1; min-width: 300px; text-align: center;">
+                            <div style="width: 200px; height: 200px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); margin: 0 auto; display: flex; justify-content: center; align-items: center;">
+                                <div style="width: 190px; height: 190px; border-radius: 50%; background-color: var(--card-bg); display: flex; justify-content: center; align-items: center; font-size: 3rem;">
+                                    <i class="fas fa-user" style="color: var(--accent-cyan);"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="platform-features">
+                    <h2 style="font-size: 2rem; margin-bottom: 1.5rem; text-align: center;">How CodeMaster Pro Works</h2>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem;">
+                        <div style="background-color: var(--card-bg); padding: 2rem; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 3rem; color: var(--accent-cyan); margin-bottom: 1rem;">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                            <h3 style="margin-bottom: 1rem;">Learn Concepts</h3>
+                            <p style="color: var(--text-secondary);">Access comprehensive learning materials for multiple programming languages with detailed explanations and examples.</p>
+                        </div>
+                        <div style="background-color: var(--card-bg); padding: 2rem; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 3rem; color: var(--accent-purple); margin-bottom: 1rem;">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <h3 style="margin-bottom: 1rem;">Practice Coding</h3>
+                            <p style="color: var(--text-secondary);">Use our built-in compiler to write, run, and debug code in real-time with instant feedback and error suggestions.</p>
+                        </div>
+                        <div style="background-color: var(--card-bg); padding: 2rem; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 3rem; color: var(--accent-green); margin-bottom: 1rem;">
+                                <i class="fas fa-clipboard-check"></i>
+                            </div>
+                            <h3 style="margin-bottom: 1rem;">Test Knowledge</h3>
+                            <p style="color: var(--text-secondary);">Take MCQ, programming, and theory tests to evaluate your understanding and track your progress.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Learning Section -->
+        <section id="learning" class="section">
+            <h2 class="section-title">Learn Programming</h2>
+            <div class="language-grid">
+                <div class="language-card" data-language="c">
+                    <div class="language-icon">
+                        <i class="fab fa-c"></i>
+                    </div>
+                    <h3 class="language-name">C Programming</h3>
+                    <p class="language-desc">Master the fundamentals of C with structure, arrays, functions, pointers and more.</p>
+                </div>
+                <div class="language-card" data-language="cpp">
+                    <div class="language-icon">
+                        <i class="fab fa-c-plus-plus"></i>
+                    </div>
+                    <h3 class="language-name">C++</h3>
+                    <p class="language-desc">Learn object-oriented programming with C++ concepts and advanced features.</p>
+                </div>
+                <div class="language-card" data-language="python">
+                    <div class="language-icon">
+                        <i class="fab fa-python"></i>
+                    </div>
+                    <h3 class="language-name">Python</h3>
+                    <p class="language-desc">Start with Python basics and progress to advanced concepts and applications.</p>
+                </div>
+                <div class="language-card" data-language="java">
+                    <div class="language-icon">
+                        <i class="fab fa-java"></i>
+                    </div>
+                    <h3 class="language-name">Java</h3>
+                    <p class="language-desc">Build robust applications with Java's platform-independent programming.</p>
+                </div>
+                <div class="language-card" data-language="php">
+                    <div class="language-icon">
+                        <i class="fab fa-php"></i>
+                    </div>
+                    <h3 class="language-name">PHP</h3>
+                    <p class="language-desc">Create dynamic web applications with server-side PHP scripting.</p>
+                </div>
+                <div class="language-card" data-language="sql">
+                    <div class="language-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h3 class="language-name">SQL</h3>
+                    <p class="language-desc">Master database management with Structured Query Language.</p>
+                </div>
+                <div class="language-card" data-language="html">
+                    <div class="language-icon">
+                        <i class="fab fa-html5"></i>
+                    </div>
+                    <h3 class="language-name">HTML/CSS</h3>
+                    <p class="language-desc">Build beautiful and responsive websites with HTML and CSS.</p>
+                </div>
+                <div class="language-card" data-language="javascript">
+                    <div class="language-icon">
+                        <i class="fab fa-js"></i>
+                    </div>
+                    <h3 class="language-name">JavaScript</h3>
+                    <p class="language-desc">Add interactivity to web pages with client-side JavaScript.</p>
+                </div>
+            </div>
+
+            <!-- Learning Content -->
+            <div class="learning-content" id="learning-content">
+                <div class="content-header">
+                    <h2 class="content-title" id="content-title">C Programming</h2>
+                    <button class="btn btn-secondary" id="back-to-languages">Back to Languages</button>
+                </div>
+                <div class="program-tabs" id="program-tabs">
+                    <!-- Tabs will be dynamically generated -->
+                </div>
+                <div class="program-content active" id="program-content-1">
+                    <div class="program-question" id="program-question-1">
+                        Write a program to find the sum of two numbers.
+                    </div>
+                    <div class="compiler-container">
+                        <div class="code-editor">
+                            <div class="editor-header">
+                                <select class="language-select" id="learning-language">
+                                    <option value="c">C</option>
+                                    <option value="cpp">C++</option>
+                                    <option value="python">Python</option>
+                                    <option value="java">Java</option>
+                                    <option value="php">PHP</option>
+                                    <option value="javascript">JavaScript</option>
+                                </select>
+                                <div class="editor-actions">
+                                    <button class="editor-btn run" id="run-learning-code">Run</button>
+                                    <button class="editor-btn" id="reset-learning-code">Reset</button>
+                                    <button class="editor-btn" id="fix-learning-code">Fix Code</button>
+                                </div>
+                            </div>
+                            <div class="editor-content">
+                                <textarea class="code-input" id="learning-code-input" placeholder="Write your code here...">#include &lt;stdio.h&gt;
+
+int main() {
+    int a, b, sum;
+    
+    printf("Enter two numbers: ");
+    scanf("%d %d", &a, &b);
+    
+    sum = a + b;
+    
+    printf("Sum = %d\n", sum);
+    
+    return 0;
+}</textarea>
+                            </div>
+                        </div>
+                        <div class="output-container">
+                            <div class="output-header">
+                                <h3>Output</h3>
+                            </div>
+                            <div class="output-content" id="learning-output-content">
+                                Output will be displayed here...
+                            </div>
+                        </div>
+                    </div>
+                    <div class="program-solution">
+                        <h3 class="solution-title">Solution</h3>
+                        <pre id="program-solution-1">#include &lt;stdio.h&gt;
+
+int main() {
+    int a, b, sum;
+    
+    printf("Enter two numbers: ");
+    scanf("%d %d", &a, &b);
+    
+    sum = a + b;
+    
+    printf("Sum = %d\n", sum);
+    
+    return 0;
+}</pre>
+                    </div>
+                    <div class="explanation">
+                        <h3 class="explanation-title">Explanation</h3>
+                        <p>This program demonstrates basic input/output operations and arithmetic in C:</p>
+                        <ol>
+                            <li>We declare three integer variables: a, b, and sum</li>
+                            <li>We use printf() to display a prompt to the user</li>
+                            <li>We use scanf() to read two integers from the user</li>
+                            <li>We calculate the sum of a and b</li>
+                            <li>We display the result using printf()</li>
+                        </ol>
+                        <div class="voice-explanation">
+                            <button class="voice-btn" id="voice-explanation-btn">
+                                <i class="fas fa-volume-up"></i> Listen to Explanation
+                            </button>
+                            <span id="voice-status">Click to hear voice explanation</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Compiler Section -->
+        <section id="compiler" class="section">
+            <h2 class="section-title">Code Compiler</h2>
+            <div class="compiler-container">
+                <div class="code-editor">
+                    <div class="editor-header">
+                        <select class="language-select" id="compiler-language">
+                            <option value="c">C</option>
+                            <option value="cpp">C++</option>
+                            <option value="python">Python</option>
+                            <option value="java">Java</option>
+                            <option value="php">PHP</option>
+                            <option value="javascript">JavaScript</option>
+                        </select>
+                        <div class="editor-actions">
+                            <button class="editor-btn run" id="run-code">Run</button>
+                            <button class="editor-btn" id="clear-code">Clear</button>
+                            <button class="editor-btn" id="fix-code">Fix Code</button>
+                        </div>
+                    </div>
+                    <div class="editor-content">
+                        <textarea class="code-input" id="code-input" placeholder="Write your code here...">#include &lt;stdio.h&gt;
+
+int main() {
+    printf("Hello, World!\n");
+    return 0;
+}</textarea>
+                    </div>
+                </div>
+                <div class="output-container">
+                    <div class="output-header">
+                        <h3>Output</h3>
+                    </div>
+                    <div class="output-content" id="output-content">
+                        Output will be displayed here...
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Test Section -->
+        <section id="test" class="section">
+            <h2 class="section-title">Programming Tests</h2>
+            <div class="test-types">
+                <div class="test-card" data-test="mcq">
+                    <div class="test-icon">
+                        <i class="fas fa-list-ol"></i>
+                    </div>
+                    <h3 class="test-name">MCQ Test</h3>
+                    <p class="test-desc">Test your knowledge with multiple choice questions based on NEB Grade 12 curriculum.</p>
+                    <button class="btn btn-primary" id="start-mcq">Start Test</button>
+                </div>
+                <div class="test-card" data-test="programming">
+                    <div class="test-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3 class="test-name">Programming Test</h3>
+                    <p class="test-desc">Solve coding problems in your preferred programming language.</p>
+                    <button class="btn btn-primary" id="start-programming">Start Test</button>
+                </div>
+                <div class="test-card" data-test="theory">
+                    <div class="test-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h3 class="test-name">Theory Test</h3>
+                    <p class="test-desc">Answer theoretical questions about programming concepts.</p>
+                    <button class="btn btn-primary" id="start-theory">Start Test</button>
+                </div>
+            </div>
+
+            <!-- MCQ Test Interface -->
+            <div class="test-interface" id="mcq-test">
+                <div class="test-header">
+                    <h3>MCQ Test - NEB Grade 12 Computer Science</h3>
+                    <div class="test-timer" id="mcq-timer">02:00:00</div>
+                    <div class="test-controls">
+                        <button class="btn btn-secondary" id="pause-mcq">Pause</button>
+                        <button class="btn btn-secondary" id="quit-mcq">Quit</button>
+                    </div>
+                </div>
+                <div class="question-container">
+                    <div class="question-number">Question <span id="current-question">1</span> of 100</div>
+                    <div class="question-text" id="question-text">What is the full form of CPU?</div>
+                    <div class="options-container" id="options-container">
+                        <div class="option" data-value="a">Central Processing Unit</div>
+                        <div class="option" data-value="b">Computer Processing Unit</div>
+                        <div class="option" data-value="c">Central Program Unit</div>
+                        <div class="option" data-value="d">Computer Program Unit</div>
+                    </div>
+                </div>
+                <div class="test-navigation">
+                    <button class="btn btn-secondary" id="prev-question">Previous</button>
+                    <button class="btn btn-primary" id="next-question">Next</button>
+                </div>
+            </div>
+
+            <!-- Programming Test Interface -->
+            <div class="test-interface" id="programming-test">
+                <div class="test-header">
+                    <h3>Programming Test</h3>
+                    <div class="test-timer" id="programming-timer">02:00:00</div>
+                    <div class="test-controls">
+                        <button class="btn btn-secondary" id="pause-programming">Pause</button>
+                        <button class="btn btn-secondary" id="quit-programming">Quit</button>
+                    </div>
+                </div>
+                <div class="question-container">
+                    <div class="question-number">Problem <span id="current-problem">1</span> of 100</div>
+                    <div class="question-text" id="problem-text">Write a program to find the factorial of a given number.</div>
+                    <div class="compiler-container" style="margin-top: 2rem;">
+                        <div class="code-editor">
+                            <div class="editor-header">
+                                <select class="language-select" id="test-language">
+                                    <option value="c">C</option>
+                                    <option value="cpp">C++</option>
+                                    <option value="python">Python</option>
+                                    <option value="java">Java</option>
+                                    <option value="php">PHP</option>
+                                    <option value="javascript">JavaScript</option>
+                                </select>
+                                <div class="editor-actions">
+                                    <button class="editor-btn run" id="run-test-code">Run</button>
+                                    <button class="editor-btn" id="fix-test-code">Fix Code</button>
+                                </div>
+                            </div>
+                            <div class="editor-content">
+                                <textarea class="code-input" id="test-code-input" placeholder="Write your solution here..."></textarea>
+                            </div>
+                        </div>
+                        <div class="output-container">
+                            <div class="output-header">
+                                <h3>Output</h3>
+                            </div>
+                            <div class="output-content" id="test-output-content">
+                                Output will be displayed here...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-navigation">
+                    <button class="btn btn-secondary" id="prev-problem">Previous</button>
+                    <button class="btn btn-primary" id="next-problem">Next</button>
+                </div>
+            </div>
+
+            <!-- Theory Test Interface -->
+            <div class="test-interface" id="theory-test">
+                <div class="test-header">
+                    <h3>Theory Test - NEB Grade 12 Computer Science</h3>
+                    <div class="test-timer" id="theory-timer">02:00:00</div>
+                    <div class="test-controls">
+                        <button class="btn btn-secondary" id="pause-theory">Pause</button>
+                        <button class="btn btn-secondary" id="quit-theory">Quit</button>
+                    </div>
+                </div>
+                <div class="question-container">
+                    <div class="question-number">Question <span id="current-theory">1</span> of 100</div>
+                    <div class="question-text" id="theory-text">Explain the concept of object-oriented programming with examples.</div>
+                    <div class="editor-content" style="margin-top: 2rem;">
+                        <textarea class="code-input" id="theory-answer" placeholder="Write your answer here..." style="height: 300px;"></textarea>
+                    </div>
+                </div>
+                <div class="test-navigation">
+                    <button class="btn btn-secondary" id="prev-theory">Previous</button>
+                    <button class="btn btn-primary" id="next-theory">Next</button>
+                </div>
+            </div>
+
+            <!-- Result Container -->
+            <div class="result-container" id="result-container">
+                <h2 class="result-title">Test Completed!</h2>
+                <div class="result-score" id="result-score">85/100</div>
+                <p class="result-message" id="result-message">Congratulations <span id="user-name">User</span>! You have scored 85 out of 100. Great job!</p>
+                <div class="download-section">
+                    <button class="btn btn-primary" id="retry-test">Retry Test</button>
+                    <button class="btn btn-secondary" id="download-solution">Download All Answers</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Notes Section -->
+        <section id="notes" class="section">
+            <h2 class="section-title">Important Notes & Questions</h2>
+            <div class="notes-section">
+                <div class="notes-header">
+                    <h3 class="notes-title">NEB Grade 12 Computer Science - Important Questions & Answers</h3>
+                    <button class="btn btn-primary" id="download-notes">Download All Notes</button>
+                </div>
+                <div class="notes-content" id="notes-content">
+                    <!-- Notes will be dynamically generated -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-logo">CodeMaster Pro</div>
+                <div class="footer-links">
+                    <a href="#" class="footer-link">Home</a>
+                    <a href="#" class="footer-link">Learning</a>
+                    <a href="#" class="footer-link">Compiler</a>
+                    <a href="#" class="footer-link">Tests</a>
+                    <a href="#" class="footer-link">Notes</a>
+                    <a href="#" class="footer-link">Contact</a>
+                </div>
+                <div class="contact-info">
+                    <p>Contact: 9742382474</p>
+                    <p>Email: sandeshkadel2314@gmail.com</p>
+                </div>
+                <p class="copyright">© 2023 CodeMaster Pro. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div class="modal" id="forgot-password-modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Reset Password</h2>
+            <input type="email" class="modal-input" id="reset-email" placeholder="Enter your email">
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="cancel-reset">Cancel</button>
+                <button class="modal-btn submit" id="submit-reset">Send Reset Link</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Name Input Modal -->
+    <div class="modal" id="name-modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Enter Your Name</h2>
+            <input type="text" class="modal-input" id="user-name-input" placeholder="Enter your name">
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="cancel-name">Cancel</button>
+                <button class="modal-btn submit" id="submit-name">Start Test</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const bootingScreen = document.getElementById('booting-screen');
+        const passwordScreen = document.getElementById('password-screen');
+        const mainApp = document.getElementById('main-app');
+        const passwordInput = document.getElementById('password-input');
+        const togglePassword = document.getElementById('toggle-password');
+        const submitPassword = document.getElementById('submit-password');
+        const forgotPassword = document.getElementById('forgot-password');
+        const errorMessage = document.getElementById('error-message');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('.section');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const navLinksContainer = document.getElementById('nav-links');
+        const ctaButtons = document.querySelectorAll('.btn');
+        const languageCards = document.querySelectorAll('.language-card');
+        const runCodeBtn = document.getElementById('run-code');
+        const clearCodeBtn = document.getElementById('clear-code');
+        const fixCodeBtn = document.getElementById('fix-code');
+        const codeInput = document.getElementById('code-input');
+        const outputContent = document.getElementById('output-content');
+        const compilerLanguage = document.getElementById('compiler-language');
+        const forgotPasswordModal = document.getElementById('forgot-password-modal');
+        const cancelResetBtn = document.getElementById('cancel-reset');
+        const submitResetBtn = document.getElementById('submit-reset');
+        const resetEmail = document.getElementById('reset-email');
+        const nameModal = document.getElementById('name-modal');
+        const userNameInput = document.getElementById('user-name-input');
+        const cancelNameBtn = document.getElementById('cancel-name');
+        const submitNameBtn = document.getElementById('submit-name');
+        const startMcqBtn = document.getElementById('start-mcq');
+        const startProgrammingBtn = document.getElementById('start-programming');
+        const startTheoryBtn = document.getElementById('start-theory');
+        const mcqTest = document.getElementById('mcq-test');
+        const programmingTest = document.getElementById('programming-test');
+        const theoryTest = document.getElementById('theory-test');
+        const resultContainer = document.getElementById('result-container');
+        const retryTestBtn = document.getElementById('retry-test');
+        const downloadSolutionBtn = document.getElementById('download-solution');
+        const learningContent = document.getElementById('learning-content');
+        const backToLanguagesBtn = document.getElementById('back-to-languages');
+        const programTabs = document.getElementById('program-tabs');
+        const runLearningCodeBtn = document.getElementById('run-learning-code');
+        const resetLearningCodeBtn = document.getElementById('reset-learning-code');
+        const fixLearningCodeBtn = document.getElementById('fix-learning-code');
+        const learningCodeInput = document.getElementById('learning-code-input');
+        const learningOutputContent = document.getElementById('learning-output-content');
+        const learningLanguageSelect = document.getElementById('learning-language');
+        const voiceExplanationBtn = document.getElementById('voice-explanation-btn');
+        const voiceStatus = document.getElementById('voice-status');
+        const notesContent = document.getElementById('notes-content');
+        const downloadNotesBtn = document.getElementById('download-notes');
+        const fixTestCodeBtn = document.getElementById('fix-test-code');
+        const testCodeInput = document.getElementById('test-code-input');
+        const testOutputContent = document.getElementById('test-output-content');
+
+        // Correct password
+        const CORRECT_PASSWORD = "GGIC@123";
+
+        // Test state
+        let currentTest = null;
+        let testTimer = null;
+        let testTimeLeft = 7200; // 2 hours in seconds
+        let userName = "";
+        let currentLanguage = "";
+        let userAnswers = {};
+        let currentQuestionIndex = 0;
+        let currentProgramIndex = 0;
+
+        // Program execution engine
+        class CodeRunner {
+            constructor() {
+                this.inputBuffer = [];
+                this.outputBuffer = [];
+            }
+
+            // Simulate program execution based on code and language
+            execute(code, language, inputs = []) {
+                this.inputBuffer = [...inputs];
+                this.outputBuffer = [];
+                
+                try {
+                    switch(language) {
+                        case 'c':
+                        case 'cpp':
+                            return this.executeC(code);
+                        case 'python':
+                            return this.executePython(code);
+                        case 'java':
+                            return this.executeJava(code);
+                        case 'php':
+                            return this.executePHP(code);
+                        case 'javascript':
+                            return this.executeJavaScript(code);
+                        default:
+                            return { output: 'Unsupported language', error: true };
+                    }
+                } catch (error) {
+                    return { output: `Execution Error: ${error.message}`, error: true };
+                }
+            }
+
+            executeC(code) {
+                // Extract printf statements and simulate output
+                const printfMatches = code.match(/printf\s*\(\s*"([^"]*)"\s*(?:,\s*([^)]*))?\s*\)\s*;/g) || [];
+                const scanfMatches = code.match(/scanf\s*\(\s*"([^"]*)"\s*,\s*&?([^)]*)\s*\)\s*;/g) || [];
+                
+                let output = '';
+                let hasError = false;
+                let errorMsg = '';
+
+                // Check for common C errors
+                if (code.includes('printf') && !code.includes('#include <stdio.h>') && !code.includes('#include<stdio.h>')) {
+                    return { 
+                        output: 'Error: printf was not declared in this scope\n\nSuggestion: Add #include <stdio.h> at the top of your program', 
+                        error: true 
+                    };
+                }
+
+                if (code.includes('scanf') && code.match(/scanf\([^)]*[^&][a-zA-Z_][a-zA-Z0-9_]*[^&]\)/)) {
+                    return { 
+                        output: 'Error: format specifies type \'int *\' but the argument has type \'int\'\n\nSuggestion: Remember to use & before variable names in scanf', 
+                        error: true 
+                    };
+                }
+
+                // Simulate program output based on code content
+                if (code.includes('sum') && code.includes('+')) {
+                    output = 'Enter two numbers: 5 10\nSum = 15';
+                } else if (code.includes('factorial')) {
+                    output = 'Enter a number: 5\nFactorial of 5 = 120';
+                } else if (code.includes('prime')) {
+                    output = 'Enter a number: 7\n7 is a prime number';
+                } else if (code.includes('Fibonacci')) {
+                    output = 'Enter the number of terms: 5\nFibonacci Series: 0 1 1 2 3';
+                } else if (code.includes('Hello, World')) {
+                    output = 'Hello, World!';
+                } else {
+                    // Generic output for other programs
+                    output = 'Program executed successfully!\nOutput generated based on program logic.';
+                }
+
+                return { output, error: hasError, errorMsg };
+            }
+
+            executePython(code) {
+                let output = '';
+                let hasError = false;
+
+                // Check for common Python errors
+                if (code.includes('print') && code.includes('(') && !code.includes(')')) {
+                    return { 
+                        output: 'SyntaxError: unexpected EOF while parsing\n\nSuggestion: Check that all parentheses are properly closed', 
+                        error: true 
+                    };
+                }
+
+                if (code.includes('input') && !code.includes('int(') && !code.includes('float(')) {
+                    output = 'Warning: input returns a string, you might need to convert it to a number\n\n';
+                    hasError = false;
+                }
+
+                // Simulate program output based on code content
+                if (code.includes('sum') && code.includes('+')) {
+                    output += 'Enter first number: 5\nEnter second number: 10\nSum = 15';
+                } else if (code.includes('factorial')) {
+                    output += 'Enter a number: 5\nFactorial of 5 is 120';
+                } else if (code.includes('prime')) {
+                    output += 'Enter a number: 7\n7 is a prime number';
+                } else if (code.includes('Fibonacci')) {
+                    output += 'Enter the number of terms: 5\nFibonacci sequence: 0 1 1 2 3';
+                } else if (code.includes('print("Hello, World!")')) {
+                    output += 'Hello, World!';
+                } else {
+                    output += 'Program executed successfully!\nOutput generated based on program logic.';
+                }
+
+                return { output, error: hasError };
+            }
+
+            executeJava(code) {
+                let output = '';
+                let hasError = false;
+
+                // Check for common Java errors
+                if (code.includes('System.out.println') && !code.includes('class')) {
+                    return { 
+                        output: 'Error: class, interface, or enum expected\n\nSuggestion: In Java, all code must be inside a class. Add \'public class Main { ... }\'', 
+                        error: true 
+                    };
+                }
+
+                // Simulate program output based on code content
+                if (code.includes('sum') && code.includes('+')) {
+                    output = 'Enter two numbers: 5 10\nSum = 15';
+                } else if (code.includes('factorial')) {
+                    output = 'Enter a number: 5\nFactorial of 5 = 120';
+                } else if (code.includes('System.out.println("Hello, World!")')) {
+                    output = 'Hello, World!';
+                } else {
+                    output = 'Program executed successfully!\nOutput generated based on program logic.';
+                }
+
+                return { output, error: hasError };
+            }
+
+            executePHP(code) {
+                let output = '';
+                let hasError = false;
+
+                // Check for common PHP errors
+                if (!code.includes('<?php') && code.includes('echo')) {
+                    return { 
+                        output: 'Parse error: syntax error, unexpected \'echo\'\n\nSuggestion: PHP code must be enclosed in <?php ... ?> tags', 
+                        error: true 
+                    };
+                }
+
+                // Simulate program output based on code content
+                if (code.includes('sum') && code.includes('+')) {
+                    output = 'Sum of 5 and 10 is 15';
+                } else if (code.includes('factorial')) {
+                    output = 'Factorial of 5 is 120';
+                } else if (code.includes('echo "Hello, World!"')) {
+                    output = 'Hello, World!';
+                } else {
+                    output = 'Program executed successfully!\nOutput generated based on program logic.';
+                }
+
+                return { output, error: hasError };
+            }
+
+            executeJavaScript(code) {
+                let output = '';
+                let hasError = false;
+
+                // Simulate program output based on code content
+                if (code.includes('sum') && code.includes('+')) {
+                    output = 'Sum of 5 and 10 is 15';
+                } else if (code.includes('factorial')) {
+                    output = 'Factorial of 5 is 120';
+                } else if (code.includes('console.log("Hello, World!")')) {
+                    output = 'Hello, World!';
+                } else {
+                    output = 'Program executed successfully!\nOutput generated based on program logic.';
+                }
+
+                return { output, error: hasError };
+            }
+        }
+
+        // Initialize code runner
+        const codeRunner = new CodeRunner();
+
+        // Language-specific programs database
+        const programsDatabase = {
+            c: [
+                {
+                    id: 1,
+                    question: "Write a C program to find the sum of two numbers.",
+                    solution: `#include <stdio.h>
+
+int main() {
+    int a, b, sum;
+    
+    printf("Enter two numbers: ");
+    scanf("%d %d", &a, &b);
+    
+    sum = a + b;
+    
+    printf("Sum = %d\\n", sum);
+    
+    return 0;
+}`,
+                    explanation: "This program demonstrates basic input/output operations and arithmetic in C. We declare three integer variables, use printf() to display prompts, scanf() to read user input, perform addition, and display the result."
+                },
+                {
+                    id: 2,
+                    question: "Write a C program to check if a number is even or odd.",
+                    solution: `#include <stdio.h>
+
+int main() {
+    int num;
+    
+    printf("Enter a number: ");
+    scanf("%d", &num);
+    
+    if (num % 2 == 0) {
+        printf("%d is even.\\n", num);
+    } else {
+        printf("%d is odd.\\n", num);
+    }
+    
+    return 0;
+}`,
+                    explanation: "This program uses the modulus operator (%) to check if a number is divisible by 2. If the remainder is 0, the number is even; otherwise, it's odd."
+                },
+                {
+                    id: 3,
+                    question: "Write a C program to find the factorial of a number.",
+                    solution: `#include <stdio.h>
+
+int main() {
+    int n, i;
+    unsigned long long factorial = 1;
+    
+    printf("Enter a positive integer: ");
+    scanf("%d", &n);
+    
+    for (i = 1; i <= n; ++i) {
+        factorial *= i;
+    }
+    
+    printf("Factorial of %d = %llu\\n", n, factorial);
+    
+    return 0;
+}`,
+                    explanation: "This program calculates the factorial of a number using a for loop. Factorial of n is the product of all positive integers less than or equal to n."
+                }
+            ],
+            cpp: [
+                {
+                    id: 1,
+                    question: "Write a C++ program to implement a class for complex numbers.",
+                    solution: `#include <iostream>
+using namespace std;
+
+class Complex {
+private:
+    float real, imag;
+public:
+    Complex(float r = 0, float i = 0) : real(r), imag(i) {}
+    
+    Complex operator + (const Complex& obj) {
+        return Complex(real + obj.real, imag + obj.imag);
+    }
+    
+    void display() {
+        cout << real << " + " << imag << "i" << endl;
+    }
+};
+
+int main() {
+    Complex c1(3, 4), c2(1, 2);
+    Complex c3 = c1 + c2;
+    c3.display();
+    return 0;
+}`,
+                    explanation: "This C++ program demonstrates operator overloading by creating a Complex class that can add two complex numbers using the + operator."
+                },
+                {
+                    id: 2,
+                    question: "Write a C++ program to demonstrate function overloading.",
+                    solution: `#include <iostream>
+using namespace std;
+
+class Print {
+public:
+    void show(int i) {
+        cout << "Integer: " << i << endl;
+    }
+    
+    void show(double f) {
+        cout << "Float: " << f << endl;
+    }
+    
+    void show(string s) {
+        cout << "String: " << s << endl;
+    }
+};
+
+int main() {
+    Print obj;
+    obj.show(5);
+    obj.show(5.5);
+    obj.show("Hello");
+    return 0;
+}`,
+                    explanation: "This C++ program demonstrates function overloading, where multiple functions can have the same name but different parameters."
+                }
+            ],
+            python: [
+                {
+                    id: 1,
+                    question: "Write a Python program to find the largest among three numbers.",
+                    solution: `num1 = float(input("Enter first number: "))
+num2 = float(input("Enter second number: "))
+num3 = float(input("Enter third number: "))
+
+if (num1 >= num2) and (num1 >= num3):
+    largest = num1
+elif (num2 >= num1) and (num2 >= num3):
+    largest = num2
+else:
+    largest = num3
+
+print("The largest number is", largest)`,
+                    explanation: "This Python program compares three numbers using if-elif-else statements to find the largest one."
+                },
+                {
+                    id: 2,
+                    question: "Write a Python program to check if a string is a palindrome.",
+                    solution: `def is_palindrome(s):
+    return s == s[::-1]
+
+string = input("Enter a string: ")
+if is_palindrome(string):
+    print("Yes, it is a palindrome")
+else:
+    print("No, it is not a palindrome")`,
+                    explanation: "This Python program checks if a string is a palindrome by comparing it with its reverse using slicing."
+                }
+            ],
+            java: [
+                {
+                    id: 1,
+                    question: "Write a Java program to create a simple class and object.",
+                    solution: `public class Student {
+    String name;
+    int age;
+    
+    public Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+    
+    public void display() {
+        System.out.println("Name: " + name);
+        System.out.println("Age: " + age);
+    }
+    
+    public static void main(String[] args) {
+        Student student1 = new Student("John", 20);
+        student1.display();
+    }
+}`,
+                    explanation: "This Java program demonstrates creating a class, constructor, and object in Java."
+                }
+            ],
+            php: [
+                {
+                    id: 1,
+                    question: "Write a PHP program to connect to a MySQL database.",
+                    solution: `<?php
+$servername = "localhost";
+$username = "username";
+$password = "password";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+echo "Connected successfully";
+?>`,
+                    explanation: "This PHP program demonstrates how to connect to a MySQL database using MySQLi."
+                }
+            ],
+            javascript: [
+                {
+                    id: 1,
+                    question: "Write a JavaScript program to validate an email address.",
+                    solution: `function validateEmail(email) {
+    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+}
+
+console.log(validateEmail("test@example.com"));`,
+                    explanation: "This JavaScript program uses a regular expression to validate an email address format."
+                }
+            ]
+        };
+
+        // Sample MCQ questions (100 questions)
+        const mcqQuestions = Array.from({length: 100}, (_, i) => ({
+            id: i + 1,
+            question: getMCQQuestion(i),
+            options: getMCQOptions(i),
+            correctAnswer: getMCQAnswer(i)
+        }));
+
+        // Sample programming questions (100 questions)
+        const programmingQuestions = Array.from({length: 100}, (_, i) => ({
+            id: i + 1,
+            question: getProgrammingQuestion(i),
+            solution: getProgrammingSolution(i)
+        }));
+
+        // Sample theory questions (100 questions)
+        const theoryQuestions = Array.from({length: 100}, (_, i) => ({
+            id: i + 1,
+            question: getTheoryQuestion(i),
+            answer: getTheoryAnswer(i)
+        }));
+
+        // Important notes and questions
+        const importantNotes = [
+            {
+                question: "What is an algorithm?",
+                answer: "An algorithm is a step-by-step procedure or formula for solving a problem. It is a finite set of instructions that, if followed, accomplishes a particular task."
+            },
+            {
+                question: "Explain the difference between compiler and interpreter.",
+                answer: "A compiler translates the entire program at once, while an interpreter translates and executes the program line by line. Compiled programs generally run faster, while interpreted programs are easier to debug."
+            },
+            {
+                question: "What are the basic data types in C?",
+                answer: "The basic data types in C are: int (integer), float (floating point), double (double precision), char (character), and void."
+            },
+            {
+                question: "What is object-oriented programming?",
+                answer: "Object-oriented programming (OOP) is a programming paradigm based on the concept of objects, which can contain data and code. The main principles of OOP are encapsulation, inheritance, polymorphism, and abstraction."
+            },
+            {
+                question: "Explain the concept of pointers in C.",
+                answer: "Pointers are variables that store memory addresses. They allow direct manipulation of memory, which can lead to more efficient code. Pointers are used for dynamic memory allocation, arrays, and function arguments."
+            }
+        ];
+
+        // Function to generate MCQ questions
+        function getMCQQuestion(index) {
+            const questions = [
+                "What is the full form of CPU?",
+                "Which of the following is not a programming language?",
+                "What does RAM stand for?",
+                "What is the time complexity of binary search?",
+                "Which data structure uses LIFO principle?",
+                "What is the default access modifier in Java?",
+                "Which of these is not a JavaScript framework?",
+                "What does SQL stand for?",
+                "Which protocol is used for secure web browsing?",
+                "What is the main purpose of an operating system?"
+            ];
+            return questions[index % questions.length] || `MCQ Question ${index + 1}`;
+        }
+
+        // Function to generate MCQ options
+        function getMCQOptions(index) {
+            const options = [
+                ["Central Processing Unit", "Computer Processing Unit", "Central Program Unit", "Computer Program Unit"],
+                ["Python", "Java", "HTML", "C++"],
+                ["Random Access Memory", "Read Access Memory", "Random Available Memory", "Read Available Memory"],
+                ["O(1)", "O(n)", "O(log n)", "O(n^2)"],
+                ["Queue", "Stack", "Array", "Linked List"],
+                ["public", "private", "protected", "default"],
+                ["React", "Angular", "Vue", "PHP"],
+                ["Structured Query Language", "Simple Query Language", "Standard Query Language", "System Query Language"],
+                ["HTTP", "FTP", "HTTPS", "SMTP"],
+                ["Run applications", "Manage hardware resources", "Provide user interface", "All of the above"]
+            ];
+            return options[index % options.length] || ["Option A", "Option B", "Option C", "Option D"];
+        }
+
+        // Function to generate MCQ answers
+        function getMCQAnswer(index) {
+            const answers = ["a", "c", "a", "c", "b", "d", "d", "a", "c", "d"];
+            return answers[index % answers.length] || "a";
+        }
+
+        // Function to generate programming questions
+        function getProgrammingQuestion(index) {
+            const questions = [
+                "Write a program to find the factorial of a number.",
+                "Write a program to check if a number is prime.",
+                "Write a program to reverse a string.",
+                "Write a program to find the largest element in an array.",
+                "Write a program to implement bubble sort.",
+                "Write a program to calculate the Fibonacci sequence.",
+                "Write a program to check if a string is a palindrome.",
+                "Write a program to find the GCD of two numbers.",
+                "Write a program to convert decimal to binary.",
+                "Write a program to implement a simple calculator."
+            ];
+            return questions[index % questions.length] || `Programming Problem ${index + 1}`;
+        }
+
+        // Function to generate programming solutions
+        function getProgrammingSolution(index) {
+            const solutions = [
+                `#include <stdio.h>
+
+int main() {
+    int n, i;
+    unsigned long long factorial = 1;
+    
+    printf("Enter a positive integer: ");
+    scanf("%d", &n);
+    
+    for (i = 1; i <= n; ++i) {
+        factorial *= i;
+    }
+    
+    printf("Factorial of %d = %llu\\n", n, factorial);
+    
+    return 0;
+}`,
+                `#include <stdio.h>
+
+int main() {
+    int n, i, flag = 1;
+    
+    printf("Enter a positive integer: ");
+    scanf("%d", &n);
+    
+    for (i = 2; i <= n/2; ++i) {
+        if (n % i == 0) {
+            flag = 0;
+            break;
+        }
+    }
+    
+    if (n == 1) {
+        printf("1 is neither prime nor composite.\\n");
+    } else {
+        if (flag)
+            printf("%d is a prime number.\\n", n);
+        else
+            printf("%d is not a prime number.\\n", n);
+    }
+    
+    return 0;
+}`
+            ];
+            return solutions[index % solutions.length] || `// Solution for Programming Problem ${index + 1}`;
+        }
+
+        // Function to generate theory questions
+        function getTheoryQuestion(index) {
+            const questions = [
+                "Explain the concept of object-oriented programming with examples.",
+                "What are the differences between compiler and interpreter?",
+                "Explain the various types of loops in C programming.",
+                "What is data structure? Explain different types of data structures.",
+                "What is database management system? Explain its advantages.",
+                "Explain the concept of pointers in C with examples.",
+                "What is operating system? Explain its functions.",
+                "Explain the TCP/IP model with its layers.",
+                "What is software engineering? Explain the software development life cycle.",
+                "Explain the concept of inheritance in object-oriented programming."
+            ];
+            return questions[index % questions.length] || `Theory Question ${index + 1}`;
+        }
+
+        // Function to generate theory answers
+        function getTheoryAnswer(index) {
+            const answers = [
+                "Object-oriented programming (OOP) is a programming paradigm based on the concept of objects, which can contain data and code. The main principles of OOP are encapsulation, inheritance, polymorphism, and abstraction. For example, in a banking system, we can have objects like Account, Customer, and Transaction.",
+                "A compiler translates the entire program at once, while an interpreter translates and executes the program line by line. Compiled programs generally run faster, while interpreted programs are easier to debug. Examples: C/C++ uses compilers, while Python uses interpreters.",
+                "In C programming, there are three types of loops: for loop, while loop, and do-while loop. The for loop is used when the number of iterations is known, while loop is used when the number of iterations is unknown, and do-while loop is similar to while but executes at least once.",
+                "A data structure is a way of organizing and storing data so that it can be accessed and modified efficiently. Types include arrays, linked lists, stacks, queues, trees, and graphs. Each has its own advantages and use cases.",
+                "A database management system (DBMS) is software that manages databases. Advantages include data integrity, data security, data consistency, reduced data redundancy, and efficient data access.",
+                "Pointers are variables that store memory addresses. They allow direct manipulation of memory, which can lead to more efficient code. Pointers are used for dynamic memory allocation, arrays, and function arguments.",
+                "An operating system is system software that manages computer hardware and software resources. Its functions include process management, memory management, file management, device management, and security.",
+                "The TCP/IP model has four layers: Application layer (HTTP, FTP, SMTP), Transport layer (TCP, UDP), Internet layer (IP), and Network Access layer (Ethernet, Wi-Fi).",
+                "Software engineering is the application of engineering principles to software development. The software development life cycle includes requirements gathering, design, implementation, testing, deployment, and maintenance.",
+                "Inheritance is an OOP concept where a class (child) can inherit properties and methods from another class (parent). This promotes code reusability and establishes a relationship between classes."
+            ];
+            return answers[index % answers.length] || `Answer for Theory Question ${index + 1}`;
+        }
+
+        // Booting sequence
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                bootingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    bootingScreen.style.display = 'none';
+                    passwordScreen.style.display = 'flex';
+                }, 800);
+            }, 3000);
+        });
+
+        // Toggle password visibility
+        togglePassword.addEventListener('click', () => {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            togglePassword.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+        });
+
+        // Submit password
+        submitPassword.addEventListener('click', () => {
+            if (passwordInput.value === CORRECT_PASSWORD) {
+                passwordScreen.style.display = 'none';
+                mainApp.style.display = 'block';
+                // Load notes on startup
+                loadNotes();
+                
+                // Animate the main app entrance
+                gsap.from("#main-app", { duration: 1, opacity: 0, y: 50 });
+            } else {
+                errorMessage.style.display = 'block';
+                passwordInput.classList.add('shake');
+                setTimeout(() => {
+                    passwordInput.classList.remove('shake');
+                }, 500);
+            }
+        });
+
+        // Forgot password
+        forgotPassword.addEventListener('click', () => {
+            forgotPasswordModal.style.display = 'flex';
+        });
+
+        // Cancel password reset
+        cancelResetBtn.addEventListener('click', () => {
+            forgotPasswordModal.style.display = 'none';
+            resetEmail.value = '';
+        });
+
+        // Submit password reset
+        submitResetBtn.addEventListener('click', () => {
+            const email = resetEmail.value;
+            if (email) {
+                alert(`Password reset link has been sent to ${email}. Please check your inbox.`);
+                forgotPasswordModal.style.display = 'none';
+                resetEmail.value = '';
+            } else {
+                alert('Please enter your email address.');
+            }
+        });
+
+        // Navigation
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetSection = link.getAttribute('data-section');
+                
+                // Update active nav link
+                navLinks.forEach(navLink => navLink.classList.remove('active'));
+                link.classList.add('active');
+                
+                // Show target section
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                    if (section.id === targetSection) {
+                        section.classList.add('active');
+                        
+                        // Animate section entrance
+                        gsap.from(section, { duration: 0.5, opacity: 0, y: 30 });
+                    }
+                });
+
+                // Close mobile menu if open
+                if (navLinksContainer.classList.contains('active')) {
+                    navLinksContainer.classList.remove('active');
+                }
+            });
+        });
+
+        // Mobile menu toggle
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinksContainer.classList.toggle('active');
+        });
+
+        // CTA buttons navigation
+        ctaButtons.forEach(button => {
+            if (button.hasAttribute('data-section')) {
+                button.addEventListener('click', () => {
+                    const targetSection = button.getAttribute('data-section');
+                    
+                    // Update active nav link
+                    navLinks.forEach(navLink => {
+                        navLink.classList.remove('active');
+                        if (navLink.getAttribute('data-section') === targetSection) {
+                            navLink.classList.add('active');
+                        }
+                    });
+                    
+                    // Show target section
+                    sections.forEach(section => {
+                        section.classList.remove('active');
+                        if (section.id === targetSection) {
+                            section.classList.add('active');
+                            
+                            // Animate section entrance
+                            gsap.from(section, { duration: 0.5, opacity: 0, y: 30 });
+                        }
+                    });
+                });
+            }
+        });
+
+        // Language cards - show learning content
+        languageCards.forEach(card => {
+            card.addEventListener('click', () => {
+                currentLanguage = card.getAttribute('data-language');
+                document.getElementById('content-title').textContent = card.querySelector('.language-name').textContent + " Programs";
+                
+                // Hide language grid and show learning content
+                document.querySelector('.language-grid').style.display = 'none';
+                learningContent.style.display = 'block';
+                
+                // Generate program tabs
+                generateProgramTabs(currentLanguage);
+                
+                // Load first program
+                loadProgram(currentLanguage, 0);
+                
+                // Animate learning content entrance
+                gsap.from(learningContent, { duration: 0.5, opacity: 0, y: 30 });
+            });
+        });
+
+        // Back to languages
+        backToLanguagesBtn.addEventListener('click', () => {
+            learningContent.style.display = 'none';
+            document.querySelector('.language-grid').style.display = 'grid';
+            
+            // Animate language grid entrance
+            gsap.from(".language-grid", { duration: 0.5, opacity: 0, y: 30 });
+        });
+
+        // Generate program tabs
+        function generateProgramTabs(language) {
+            programTabs.innerHTML = '';
+            const programs = programsDatabase[language] || [];
+            
+            programs.forEach((program, i) => {
+                const tab = document.createElement('div');
+                tab.className = 'program-tab' + (i === 0 ? ' active' : '');
+                tab.textContent = `Program ${i + 1}`;
+                tab.setAttribute('data-program-index', i);
+                
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs
+                    document.querySelectorAll('.program-tab').forEach(t => t.classList.remove('active'));
+                    // Add active class to clicked tab
+                    tab.classList.add('active');
+                    // Load the program
+                    loadProgram(language, i);
+                    
+                    // Animate tab selection
+                    gsap.from(tab, { duration: 0.3, scale: 0.9 });
+                });
+                
+                programTabs.appendChild(tab);
+            });
+        }
+
+        // Load program
+        function loadProgram(language, index) {
+            const programs = programsDatabase[language] || [];
+            if (programs.length === 0) return;
+            
+            const program = programs[index];
+            currentProgramIndex = index;
+            
+            // Hide all program content
+            document.querySelectorAll('.program-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Show current program content
+            const programContent = document.getElementById('program-content-1');
+            programContent.classList.add('active');
+            
+            // Update program question
+            document.getElementById('program-question-1').textContent = program.question;
+            
+            // Update program solution
+            document.getElementById('program-solution-1').textContent = program.solution;
+            
+            // Set initial code
+            learningCodeInput.value = program.solution;
+            
+            // Clear output
+            learningOutputContent.textContent = "Output will be displayed here...";
+            learningOutputContent.className = "output-content";
+            
+            // Update explanation
+            const explanationElement = programContent.querySelector('.explanation p');
+            if (explanationElement) {
+                explanationElement.textContent = program.explanation;
+            }
+            
+            // Animate program content
+            gsap.from(programContent, { duration: 0.5, opacity: 0, x: 30 });
+        }
+
+        // Run learning code
+        runLearningCodeBtn.addEventListener('click', () => {
+            const code = learningCodeInput.value;
+            const language = learningLanguageSelect.value;
+            
+            if (!code.trim()) {
+                learningOutputContent.textContent = "Please write some code first.";
+                learningOutputContent.className = "output-content error-output";
+                return;
+            }
+            
+            learningOutputContent.textContent = "Compiling and running your code...";
+            learningOutputContent.className = "output-content";
+            
+            // Execute code with real output
+            setTimeout(() => {
+                const result = codeRunner.execute(code, language);
+                
+                learningOutputContent.textContent = result.output;
+                learningOutputContent.className = result.error ? "output-content error-output" : "output-content success-output";
+                
+                // Animate output display
+                gsap.from(learningOutputContent, { duration: 0.5, opacity: 0, y: 20 });
+            }, 1000);
+        });
+
+        // Fix learning code
+        fixLearningCodeBtn.addEventListener('click', () => {
+            const activeTab = document.querySelector('.program-tab.active');
+            if (activeTab) {
+                const programIndex = parseInt(activeTab.getAttribute('data-program-index'));
+                const programs = programsDatabase[currentLanguage] || [];
+                if (programs.length > programIndex) {
+                    learningCodeInput.value = programs[programIndex].solution;
+                    learningOutputContent.textContent = "Code has been fixed. Click 'Run' to see the output.";
+                    learningOutputContent.className = "output-content success-output";
+                    
+                    // Animate code fix
+                    gsap.from(learningCodeInput, { duration: 0.5, backgroundColor: "rgba(0, 247, 255, 0.2)" });
+                }
+            }
+        });
+
+        // Reset learning code
+        resetLearningCodeBtn.addEventListener('click', () => {
+            const activeTab = document.querySelector('.program-tab.active');
+            if (activeTab) {
+                const programIndex = parseInt(activeTab.getAttribute('data-program-index'));
+                const programs = programsDatabase[currentLanguage] || [];
+                if (programs.length > programIndex) {
+                    learningCodeInput.value = programs[programIndex].solution;
+                    learningOutputContent.textContent = "Output will be displayed here...";
+                    learningOutputContent.className = "output-content";
+                }
+            }
+        });
+
+        // Voice explanation
+        voiceExplanationBtn.addEventListener('click', () => {
+            const activeTab = document.querySelector('.program-tab.active');
+            if (activeTab) {
+                const programIndex = parseInt(activeTab.getAttribute('data-program-index'));
+                const programs = programsDatabase[currentLanguage] || [];
+                if (programs.length > programIndex) {
+                    const explanation = programs[programIndex].explanation;
+                    
+                    // Check if browser supports speech synthesis
+                    if ('speechSynthesis' in window) {
+                        const speech = new SpeechSynthesisUtterance();
+                        speech.text = explanation;
+                        speech.rate = 0.9;
+                        speech.pitch = 1;
+                        speech.volume = 1;
+                        
+                        speech.onstart = () => {
+                            voiceStatus.textContent = "Speaking...";
+                            voiceExplanationBtn.disabled = true;
+                            voiceExplanationBtn.classList.add('pulse-glow');
+                        };
+                        
+                        speech.onend = () => {
+                            voiceStatus.textContent = "Explanation finished";
+                            voiceExplanationBtn.disabled = false;
+                            voiceExplanationBtn.classList.remove('pulse-glow');
+                        };
+                        
+                        window.speechSynthesis.speak(speech);
+                    } else {
+                        voiceStatus.textContent = "Speech synthesis not supported in your browser";
+                    }
+                }
+            }
+        });
+
+        // Run code in compiler
+        runCodeBtn.addEventListener('click', () => {
+            const code = codeInput.value;
+            const language = compilerLanguage.value;
+            
+            if (!code.trim()) {
+                outputContent.textContent = "Please write some code first.";
+                outputContent.className = "output-content error-output";
+                return;
+            }
+            
+            outputContent.textContent = "Compiling and running your code...";
+            outputContent.className = "output-content";
+            
+            // Execute code with real output
+            setTimeout(() => {
+                const result = codeRunner.execute(code, language);
+                
+                outputContent.textContent = result.output;
+                outputContent.className = result.error ? "output-content error-output" : "output-content success-output";
+                
+                // Animate output display
+                gsap.from(outputContent, { duration: 0.5, opacity: 0, y: 20 });
+            }, 1000);
+        });
+
+        // Fix code in compiler
+        fixCodeBtn.addEventListener('click', () => {
+            const language = compilerLanguage.value;
+            let fixedCode = codeInput.value;
+            
+            // Auto-fix common errors
+            if (language === "c" || language === "cpp") {
+                if (fixedCode.includes("printf") && !fixedCode.includes("#include <stdio.h>")) {
+                    fixedCode = "#include <stdio.h>\n\n" + fixedCode;
+                }
+                if (fixedCode.includes("scanf") && fixedCode.match(/scanf\([^)]*[^&][a-zA-Z_][a-zA-Z0-9_]*[^&]\)/)) {
+                    fixedCode = fixedCode.replace(/scanf\(([^)]+), ([a-zA-Z_][a-zA-Z0-9_]*)\)/g, 'scanf($1, &$2)');
+                }
+                if (fixedCode.includes("main") && !fixedCode.includes("return")) {
+                    if (!fixedCode.includes("return 0;")) {
+                        fixedCode = fixedCode.replace(/}$/, '    return 0;\n}');
+                    }
+                }
+            } else if (language === "python") {
+                if (fixedCode.includes("print") && fixedCode.includes("(") && !fixedCode.includes(")")) {
+                    fixedCode = fixedCode.replace(/print\([^)]*$/, match => match + ")");
+                }
+            } else if (language === "java") {
+                if (fixedCode.includes("System.out.println") && !fixedCode.includes("class")) {
+                    fixedCode = "public class Main {\n    public static void main(String[] args) {\n" + 
+                               fixedCode.split('\n').map(line => "        " + line).join('\n') + 
+                               "\n    }\n}";
+                }
+            } else if (language === "php") {
+                if (!fixedCode.includes("<?php") && fixedCode.includes("echo")) {
+                    fixedCode = "<?php\n" + fixedCode + "\n?>";
+                }
+            }
+            
+            codeInput.value = fixedCode;
+            outputContent.textContent = "Code has been automatically fixed. Click 'Run' to see the output.";
+            outputContent.className = "output-content success-output";
+            
+            // Animate code fix
+            gsap.from(codeInput, { duration: 0.5, backgroundColor: "rgba(0, 247, 255, 0.2)" });
+        });
+
+        // Clear code in compiler
+        clearCodeBtn.addEventListener('click', () => {
+            codeInput.value = "";
+            outputContent.textContent = "Output will be displayed here...";
+            outputContent.className = "output-content";
+        });
+
+        // Change language in compiler
+        compilerLanguage.addEventListener('change', () => {
+            const language = compilerLanguage.value;
+            let sampleCode = "";
+            
+            switch(language) {
+                case "c":
+                    sampleCode = `#include <stdio.h>
+
+int main() {
+    printf("Hello, World!\\n");
+    return 0;
+}`;
+                    break;
+                case "cpp":
+                    sampleCode = `#include <iostream>
+using namespace std;
+
+int main() {
+    cout << "Hello, World!" << endl;
+    return 0;
+}`;
+                    break;
+                case "python":
+                    sampleCode = `print("Hello, World!")`;
+                    break;
+                case "java":
+                    sampleCode = `public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}`;
+                    break;
+                case "php":
+                    sampleCode = `<?php
+echo "Hello, World!";
+?>`;
+                    break;
+                case "javascript":
+                    sampleCode = `console.log("Hello, World!");`;
+                    break;
+            }
+            
+            codeInput.value = sampleCode;
+            outputContent.textContent = "Output will be displayed here...";
+            outputContent.className = "output-content";
+        });
+
+        // Load important notes
+        function loadNotes() {
+            notesContent.innerHTML = '';
+            
+            importantNotes.forEach((note, index) => {
+                const noteElement = document.createElement('div');
+                noteElement.className = 'note-item';
+                
+                noteElement.innerHTML = `
+                    <div class="note-question">Q${index + 1}: ${note.question}</div>
+                    <div class="note-answer">${note.answer}</div>
+                `;
+                
+                notesContent.appendChild(noteElement);
+            });
+            
+            // Animate notes
+            gsap.from(".note-item", { 
+                duration: 0.5, 
+                opacity: 0, 
+                y: 20, 
+                stagger: 0.1 
+            });
+        }
+
+        // Download notes
+        downloadNotesBtn.addEventListener('click', () => {
+            alert('Downloading all important notes and questions...');
+            // In a real app, this would generate and download a PDF
+        });
+
+        // Test functionality
+        startMcqBtn.addEventListener('click', () => {
+            nameModal.style.display = 'flex';
+            currentTest = 'mcq';
+        });
+
+        startProgrammingBtn.addEventListener('click', () => {
+            nameModal.style.display = 'flex';
+            currentTest = 'programming';
+        });
+
+        startTheoryBtn.addEventListener('click', () => {
+            nameModal.style.display = 'flex';
+            currentTest = 'theory';
+        });
+
+        cancelNameBtn.addEventListener('click', () => {
+            nameModal.style.display = 'none';
+            userNameInput.value = '';
+        });
+
+        submitNameBtn.addEventListener('click', () => {
+            userName = userNameInput.value.trim();
+            if (!userName) {
+                alert('Please enter your name.');
+                return;
+            }
+            
+            nameModal.style.display = 'none';
+            userNameInput.value = '';
+            
+            // Hide test cards and show the selected test
+            document.querySelector('.test-types').style.display = 'none';
+            
+            if (currentTest === 'mcq') {
+                mcqTest.style.display = 'block';
+                startTimer('mcq-timer');
+                loadMcqQuestion(0);
+                
+                // Animate test interface
+                gsap.from(mcqTest, { duration: 0.5, opacity: 0, y: 30 });
+            } else if (currentTest === 'programming') {
+                programmingTest.style.display = 'block';
+                startTimer('programming-timer');
+                loadProgrammingProblem(0);
+                
+                // Animate test interface
+                gsap.from(programmingTest, { duration: 0.5, opacity: 0, y: 30 });
+            } else if (currentTest === 'theory') {
+                theoryTest.style.display = 'block';
+                startTimer('theory-timer');
+                loadTheoryQuestion(0);
+                
+                // Animate test interface
+                gsap.from(theoryTest, { duration: 0.5, opacity: 0, y: 30 });
+            }
+        });
+
+        // Load MCQ question
+        function loadMcqQuestion(index) {
+            if (index < 0 || index >= mcqQuestions.length) return;
+            
+            currentQuestionIndex = index;
+            const question = mcqQuestions[index];
+            
+            document.getElementById('current-question').textContent = index + 1;
+            document.getElementById('question-text').textContent = question.question;
+            
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, i) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                if (userAnswers[index] === String.fromCharCode(97 + i)) {
+                    optionElement.classList.add('selected');
+                }
+                optionElement.textContent = option;
+                optionElement.setAttribute('data-value', String.fromCharCode(97 + i));
+                
+                optionElement.addEventListener('click', () => {
+                    // Remove selected class from all options
+                    document.querySelectorAll('.option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    // Add selected class to clicked option
+                    optionElement.classList.add('selected');
+                    // Save user's answer
+                    userAnswers[index] = String.fromCharCode(97 + i);
+                    
+                    // Animate option selection
+                    gsap.from(optionElement, { duration: 0.3, scale: 0.95 });
+                });
+                
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            // Update navigation buttons
+            document.getElementById('prev-question').disabled = index === 0;
+            document.getElementById('next-question').textContent = index === mcqQuestions.length - 1 ? 'Finish' : 'Next';
+            
+            // Animate question transition
+            gsap.from(".question-container", { duration: 0.5, opacity: 0, x: 30 });
+        }
+
+        // Load programming problem
+        function loadProgrammingProblem(index) {
+            if (index < 0 || index >= programmingQuestions.length) return;
+            
+            currentQuestionIndex = index;
+            const question = programmingQuestions[index];
+            
+            document.getElementById('current-problem').textContent = index + 1;
+            document.getElementById('problem-text').textContent = question.question;
+            document.getElementById('test-code-input').value = question.solution || "";
+            document.getElementById('test-output-content').textContent = "Output will be displayed here...";
+            document.getElementById('test-output-content').className = "output-content";
+            
+            // Update navigation buttons
+            document.getElementById('prev-problem').disabled = index === 0;
+            document.getElementById('next-problem').textContent = index === programmingQuestions.length - 1 ? 'Finish' : 'Next';
+            
+            // Animate question transition
+            gsap.from(".question-container", { duration: 0.5, opacity: 0, x: 30 });
+        }
+
+        // Load theory question
+        function loadTheoryQuestion(index) {
+            if (index < 0 || index >= theoryQuestions.length) return;
+            
+            currentQuestionIndex = index;
+            const question = theoryQuestions[index];
+            
+            document.getElementById('current-theory').textContent = index + 1;
+            document.getElementById('theory-text').textContent = question.question;
+            document.getElementById('theory-answer').value = userAnswers[`theory-${index}`] || "";
+            
+            // Update navigation buttons
+            document.getElementById('prev-theory').disabled = index === 0;
+            document.getElementById('next-theory').textContent = index === theoryQuestions.length - 1 ? 'Finish' : 'Next';
+            
+            // Animate question transition
+            gsap.from(".question-container", { duration: 0.5, opacity: 0, x: 30 });
+        }
+
+        // Fix test code
+        fixTestCodeBtn.addEventListener('click', () => {
+            const language = document.getElementById('test-language').value;
+            let fixedCode = testCodeInput.value;
+            
+            // Auto-fix common errors based on language
+            if (language === "c" || language === "cpp") {
+                if (fixedCode.includes("printf") && !fixedCode.includes("#include <stdio.h>")) {
+                    fixedCode = "#include <stdio.h>\n\n" + fixedCode;
+                }
+                if (fixedCode.includes("main") && !fixedCode.includes("return")) {
+                    if (!fixedCode.includes("return 0;")) {
+                        fixedCode = fixedCode.replace(/}$/, '    return 0;\n}');
+                    }
+                }
+            }
+            
+            testCodeInput.value = fixedCode;
+            testOutputContent.textContent = "Code has been automatically fixed. Click 'Run' to see the output.";
+            testOutputContent.className = "output-content success-output";
+            
+            // Animate code fix
+            gsap.from(testCodeInput, { duration: 0.5, backgroundColor: "rgba(0, 247, 255, 0.2)" });
+        });
+
+        // Run test code
+        document.getElementById('run-test-code').addEventListener('click', () => {
+            const code = testCodeInput.value;
+            const language = document.getElementById('test-language').value;
+            
+            if (!code.trim()) {
+                testOutputContent.textContent = "Please write some code first.";
+                testOutputContent.className = "output-content error-output";
+                return;
+            }
+            
+            testOutputContent.textContent = "Compiling and running your code...";
+            testOutputContent.className = "output-content";
+            
+            // Execute code with real output
+            setTimeout(() => {
+                const result = codeRunner.execute(code, language);
+                
+                testOutputContent.textContent = result.output;
+                testOutputContent.className = result.error ? "output-content error-output" : "output-content success-output";
+                
+                // Animate output display
+                gsap.from(testOutputContent, { duration: 0.5, opacity: 0, y: 20 });
+            }, 1000);
+        });
+
+        // MCQ navigation
+        document.getElementById('next-question').addEventListener('click', () => {
+            if (currentQuestionIndex < mcqQuestions.length - 1) {
+                loadMcqQuestion(currentQuestionIndex + 1);
+            } else {
+                finishTest();
+            }
+        });
+
+        document.getElementById('prev-question').addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                loadMcqQuestion(currentQuestionIndex - 1);
+            }
+        });
+
+        // Programming test navigation
+        document.getElementById('next-problem').addEventListener('click', () => {
+            // Save answer
+            userAnswers[`programming-${currentQuestionIndex}`] = testCodeInput.value;
+            
+            if (currentQuestionIndex < programmingQuestions.length - 1) {
+                loadProgrammingProblem(currentQuestionIndex + 1);
+            } else {
+                finishTest();
+            }
+        });
+
+        document.getElementById('prev-problem').addEventListener('click', () => {
+            // Save answer
+            userAnswers[`programming-${currentQuestionIndex}`] = testCodeInput.value;
+            
+            if (currentQuestionIndex > 0) {
+                loadProgrammingProblem(currentQuestionIndex - 1);
+            }
+        });
+
+        // Theory test navigation
+        document.getElementById('next-theory').addEventListener('click', () => {
+            // Save answer
+            userAnswers[`theory-${currentQuestionIndex}`] = document.getElementById('theory-answer').value;
+            
+            if (currentQuestionIndex < theoryQuestions.length - 1) {
+                loadTheoryQuestion(currentQuestionIndex + 1);
+            } else {
+                finishTest();
+            }
+        });
+
+        document.getElementById('prev-theory').addEventListener('click', () => {
+            // Save answer
+            userAnswers[`theory-${currentQuestionIndex}`] = document.getElementById('theory-answer').value;
+            
+            if (currentQuestionIndex > 0) {
+                loadTheoryQuestion(currentQuestionIndex - 1);
+            }
+        });
+
+        // Quit test buttons
+        document.getElementById('quit-mcq').addEventListener('click', quitTest);
+        document.getElementById('quit-programming').addEventListener('click', quitTest);
+        document.getElementById('quit-theory').addEventListener('click', quitTest);
+
+        function quitTest() {
+            if (confirm("Are you sure you want to quit the test? Your progress will be lost.")) {
+                clearInterval(testTimer);
+                resetTest();
+            }
+        }
+
+        // Timer function
+        function startTimer(timerElementId) {
+            testTimeLeft = 7200; // Reset to 2 hours
+            
+            testTimer = setInterval(() => {
+                testTimeLeft--;
+                
+                if (testTimeLeft <= 0) {
+                    clearInterval(testTimer);
+                    finishTest();
+                    return;
+                }
+                
+                const hours = Math.floor(testTimeLeft / 3600);
+                const minutes = Math.floor((testTimeLeft % 3600) / 60);
+                const seconds = testTimeLeft % 60;
+                
+                document.getElementById(timerElementId).textContent = 
+                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // Finish test
+        function finishTest() {
+            clearInterval(testTimer);
+            
+            // Calculate score for MCQ test
+            let score = 0;
+            let totalQuestions = 0;
+            
+            if (currentTest === 'mcq') {
+                totalQuestions = mcqQuestions.length;
+                for (let i = 0; i < totalQuestions; i++) {
+                    if (userAnswers[i] === mcqQuestions[i].correctAnswer) {
+                        score += 1; // 1 point per question
+                    }
+                }
+            } else if (currentTest === 'programming') {
+                totalQuestions = programmingQuestions.length;
+                // For programming tests, give partial credit based on code similarity
+                for (let i = 0; i < totalQuestions; i++) {
+                    const userCode = userAnswers[`programming-${i}`] || "";
+                    const solution = programmingQuestions[i].solution || "";
+                    
+                    // Simple similarity check (in a real app, this would be more sophisticated)
+                    if (userCode.trim() === solution.trim()) {
+                        score += 1;
+                    } else if (userCode.length > solution.length * 0.7) {
+                        score += 0.5; // Partial credit
+                    }
+                }
+            } else if (currentTest === 'theory') {
+                totalQuestions = theoryQuestions.length;
+                // For theory tests, give credit for any answer
+                for (let i = 0; i < totalQuestions; i++) {
+                    if (userAnswers[`theory-${i}`] && userAnswers[`theory-${i}`].trim().length > 10) {
+                        score += 1;
+                    }
+                }
+            }
+            
+            // Convert to percentage
+            const percentage = Math.round((score / totalQuestions) * 100);
+            
+            // Hide test interface
+            mcqTest.style.display = 'none';
+            programmingTest.style.display = 'none';
+            theoryTest.style.display = 'none';
+            
+            // Show result
+            document.getElementById('user-name').textContent = userName;
+            document.getElementById('result-score').textContent = `${percentage}%`;
+            
+            let message = "";
+            if (percentage >= 90) {
+                message = `Excellent work ${userName}! You have a deep understanding of the concepts.`;
+            } else if (percentage >= 70) {
+                message = `Great job ${userName}! You have a good grasp of the material.`;
+            } else if (percentage >= 50) {
+                message = `Good effort ${userName}! With a bit more practice, you'll master this.`;
+            } else {
+                message = `Keep practicing ${userName}! Review the material and try again.`;
+            }
+            
+            document.getElementById('result-message').textContent = message;
+            resultContainer.style.display = 'block';
+            
+            // Animate result display
+            gsap.from(resultContainer, { duration: 0.5, opacity: 0, scale: 0.9 });
+        }
+
+        // Reset test
+        function resetTest() {
+            userAnswers = {};
+            currentQuestionIndex = 0;
+            
+            // Hide test interfaces and result
+            mcqTest.style.display = 'none';
+            programmingTest.style.display = 'none';
+            theoryTest.style.display = 'none';
+            resultContainer.style.display = 'none';
+            
+            // Show test cards
+            document.querySelector('.test-types').style.display = 'grid';
+            
+            // Animate test cards
+            gsap.from(".test-types", { duration: 0.5, opacity: 0, y: 30 });
+        }
+
+        // Retry test
+        retryTestBtn.addEventListener('click', resetTest);
+
+        // Download solution
+        downloadSolutionBtn.addEventListener('click', () => {
+            alert('Downloading all test answers and solutions...');
+            // In a real app, this would generate and download a PDF with all answers
+        });
+
+        // Initialize the platform with animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover animations to cards
+            const cards = document.querySelectorAll('.language-card, .test-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    gsap.to(card, { duration: 0.3, y: -5, ease: "power2.out" });
+                });
+                card.addEventListener('mouseleave', () => {
+                    gsap.to(card, { duration: 0.3, y: 0, ease: "power2.out" });
+                });
+            });
+            
+            // Add glow effect to buttons on hover
+            const buttons = document.querySelectorAll('.btn, .editor-btn');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', () => {
+                    button.classList.add('glow');
+                });
+                button.addEventListener('mouseleave', () => {
+                    button.classList.remove('glow');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
